@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client Onboarding Playbook</title>
+    <style>
+        body { font-family: Arial; }
+        .page { display: none; }
+        .active { display: block; }
+        input, select { margin: 10px 0; width: 100%; }
+        button { margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Client Onboarding Playbook</h1>
+    <form id="playbookForm">
+        <!-- Page 1: Company Basics -->
+        <div id="page1" class="page">
+            <h2>Company Overview</h2>
+            <label>1. Company name: <input type="text" name="company_name" required></label><br>
+            <label>2. Primary industry: <input type="text" name="industry"></label><br>
+            <!-- Add all Q1-6,30 similarly -->
+            <button type="button" onclick="nextPage(2)">Next</button>
+        </div>
+        
+        <!-- Page 2: Contacts (Q7-12,31) -->
+        <div id="page2" class="page">
+            <h2>Key Contacts</h2>
+            <!-- Inputs for Q7-12,31 -->
+            <button type="button" onclick="prevPage(1)">Back</button>
+            <button type="button" onclick="nextPage(3)">Next</button>
+        </div>
+        
+        <!-- Pages 3-6 similarly for other categories, with conditionals in JS -->
+        
+        <!-- Submit Page -->
+        <div id="page6" class="page">
+            <!-- Final questions -->
+            <button type="button" onclick="prevPage(5)">Back</button>
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+    <script>
+        let currentPage = 1;
+        showPage(currentPage);
+
+        function showPage(n) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`page${n}`).classList.add('active');
+            // Conditional logic example: if (document.querySelector('[name="services_needed"]').value.includes('asset')) showPage4();
+        }
+
+        function nextPage(n) { if (validatePage(currentPage)) { currentPage = n; showPage(n); } }
+        function prevPage(n) { currentPage = n; showPage(n); }
+
+        function validatePage(page) {
+            // Check required fields
+            return true; // Implement actual validation
+        }
+
+        document.getElementById('playbookForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const jsonData = Object.fromEntries(formData.entries());
+            // Handle multi-value fields (e.g., additional contacts as array)
+            jsonData.additional_contacts = jsonData.additional_contacts ? jsonData.additional_contacts.split(',') : [];
+            // Download as JSON or send to backend
+            downloadJSON(jsonData, 'intake_data.json');
+            // Or POST to server: fetch('/submit', { method: 'POST', body: JSON.stringify(jsonData) });
+        });
+
+        function downloadJSON(data, filename) {
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = filename; a.click();
+        }
+    </script>
+</body>
+</html>
