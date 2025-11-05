@@ -4,40 +4,95 @@
     <meta charset="UTF-8">
     <title>Client Onboarding Playbook</title>
     <style>
-        body { font-family: Arial; }
-        .page { display: none; }
+        body { font-family: Arial; max-width: 800px; margin: auto; padding: 20px; }
+        .page { display: none; border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; }
         .active { display: block; }
-        input, select { margin: 10px 0; width: 100%; }
-        button { margin: 10px; }
+        label { display: block; margin: 10px 0; }
+        input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { padding: 10px 20px; margin: 10px 5px; cursor: pointer; }
+        #progress { text-align: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
     <h1>Client Onboarding Playbook</h1>
+    <div id="progress">Page <span id="currentPage">1</span> of 6</div>
     <form id="playbookForm">
         <!-- Page 1: Company Basics -->
         <div id="page1" class="page">
             <h2>Company Overview</h2>
-            <label>1. Company name: <input type="text" name="company_name" required></label><br>
-            <label>2. Primary industry: <input type="text" name="industry"></label><br>
-            <!-- Add all Q1-6,30 similarly -->
+            <label>1. Company name: <input type="text" name="company_name"></label>
+            <label>2. Primary industry/sector (e.g., tech, healthcare): <input type="text" name="industry"></label>
+            <label>3. Company size (# employees): <input type="number" name="company_size"></label>
+            <label>4. Primary location/address: <textarea name="primary_location"></textarea></label>
+            <label>5. Website URL: <input type="url" name="website_url"></label>
+            <label>6. Preferred support email: <input type="email" name="preferred_support_email"></label>
+            <label>30. Data residency preferences (e.g., US, EU for compliance): <select name="data_residency"><option value="US">US</option><option value="EU">EU</option><option value="Other">Other</option></select></label>
             <button type="button" onclick="nextPage(2)">Next</button>
         </div>
         
-        <!-- Page 2: Contacts (Q7-12,31) -->
+        <!-- Page 2: Key Contacts -->
         <div id="page2" class="page">
             <h2>Key Contacts</h2>
-            <!-- Inputs for Q7-12,31 -->
+            <label>7. Primary contact full name: <input type="text" name="primary_contact_name"></label>
+            <label>8. Contact email: <input type="email" name="contact_email"></label>
+            <label>9. Contact phone/mobile: <input type="tel" name="contact_phone"></label>
+            <label>10. Job title/role: <input type="text" name="job_title"></label>
+            <label>11. Additional contacts (comma-separated: name,email,role): <textarea name="additional_contacts"></textarea></label>
+            <label>12. External ID (e.g., from CRM for sync): <input type="text" name="external_id"></label>
+            <label>31. Preferred authentication method for contacts (e.g., SSO, API tokens): <select name="auth_method"><option value="SSO">SSO</option><option value="API Tokens">API Tokens</option><option value="Other">Other</option></select></label>
             <button type="button" onclick="prevPage(1)">Back</button>
             <button type="button" onclick="nextPage(3)">Next</button>
         </div>
         
-        <!-- Pages 3-6 similarly for other categories, with conditionals in JS -->
+        <!-- Page 3: Service Requirements -->
+        <div id="page3" class="page">
+            <h2>Support Needs</h2>
+            <label>13. Key services needed (comma-separated, e.g., IT support, asset management): <textarea name="key_services"></textarea></label>
+            <label>14. Priority levels (define low/medium/high/urgent thresholds): <textarea name="priority_levels"></textarea></label>
+            <label>15. Expected SLAs (e.g., response times for tickets): <textarea name="expected_slas"></textarea></label>
+            <label>16. Custom fields needed (comma-separated, e.g., project codes, budget IDs): <textarea name="custom_fields_needed"></textarea></label>
+            <label>17. Workflow preferences (e.g., approval chains for requests): <textarea name="workflow_preferences"></textarea></label>
+            <label>32. Automated journey triggers (e.g., auto-ticket on new asset): <textarea name="journey_triggers"></textarea></label>
+            <label>33. Reporting preferences (e.g., custom dashboards via API): <textarea name="reporting_preferences"></textarea></label>
+            <button type="button" onclick="prevPage(2)">Back</button>
+            <button type="button" onclick="conditionalNext(4, 'key_services', 'asset management')">Next (or Skip Assets)</button>
+        </div>
         
-        <!-- Submit Page -->
+        <!-- Page 4: Assets & Infrastructure (Conditional) -->
+        <div id="page4" class="page">
+            <h2>Assets & Infrastructure</h2>
+            <label>18. List of key assets (comma-separated, e.g., hardware, software, serial numbers): <textarea name="key_assets"></textarea></label>
+            <label>19. Asset types (comma-separated, e.g., laptops, servers): <textarea name="asset_types"></textarea></label>
+            <label>20. Purchase dates and warranty expirations (format: asset:date,expiration): <textarea name="purchase_warranty"></textarea></label>
+            <label>21. Assigned users/departments for assets: <textarea name="assigned_assets"></textarea></label>
+            <label>34. Asset discovery integrations (e.g., API to pull from Azure/Intune): <textarea name="asset_integrations"></textarea></label>
+            <button type="button" onclick="prevPage(3)">Back</button>
+            <button type="button" onclick="conditionalNext(5, 'key_vendors', 'vendor')">Next (or Skip Vendors)</button>
+        </div>
+        
+        <!-- Page 5: Vendors & Contracts (Conditional) -->
+        <div id="page5" class="page">
+            <h2>Vendors & Contracts</h2>
+            <label>22. Key vendors/suppliers (comma-separated: names, types): <textarea name="key_vendors"></textarea></label>
+            <label>23. Vendor contacts (comma-separated: email, phone): <textarea name="vendor_contacts"></textarea></label>
+            <label>24. Contract details (e.g., start/end dates, terms): <textarea name="contract_details"></textarea></label>
+            <label>35. Vendor API access needs (e.g., for auto-purchase orders): <textarea name="vendor_api_needs"></textarea></label>
+            <button type="button" onclick="prevPage(4)">Back</button>
+            <button type="button" onclick="nextPage(6)">Next</button>
+        </div>
+        
+        <!-- Page 6: Additional Configurations -->
         <div id="page6" class="page">
-            <!-- Final questions -->
+            <h2>Integrations & Final Setup</h2>
+            <label>25. Locations (comma-separated: branch offices with addresses, contacts): <textarea name="locations"></textarea></label>
+            <label>26. Products/services in use (e.g., software licenses): <textarea name="products_in_use"></textarea></label>
+            <label>27. Any attachments (upload files): <input type="file" name="attachments" multiple></label>
+            <label>28. Onboarding timeline/preferences: <textarea name="onboarding_timeline"></textarea></label>
+            <label>29. Any specific integrations needed (e.g., with CRM, email): <textarea name="specific_integrations"></textarea></label>
+            <label>36. Webhook endpoints for notifications (e.g., external URL for API pushes): <input type="url" name="webhook_endpoints"></label>
+            <label>37. Custom API scopes/permissions for this client: <textarea name="custom_api_scopes"></textarea></label>
             <button type="button" onclick="prevPage(5)">Back</button>
-            <button type="submit">Submit</button>
+            <button type="submit">Submit & Download Data</button>
         </div>
     </form>
 
@@ -47,34 +102,68 @@
 
         function showPage(n) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(`page${n}`).classList.add('active');
-            // Conditional logic example: if (document.querySelector('[name="services_needed"]').value.includes('asset')) showPage4();
+            const pageElement = document.getElementById(`page${n}`);
+            if (pageElement) {
+                pageElement.classList.add('active');
+                document.getElementById('currentPage').textContent = n;
+            }
         }
 
-        function nextPage(n) { if (validatePage(currentPage)) { currentPage = n; showPage(n); } }
-        function prevPage(n) { currentPage = n; showPage(n); }
+        function nextPage(n) {
+            currentPage = n;
+            showPage(n);
+        }
 
-        function validatePage(page) {
-            // Check required fields
-            return true; // Implement actual validation
+        function prevPage(n) {
+            currentPage = n;
+            showPage(n);
+        }
+
+        function conditionalNext(nextPageNum, fieldName, keyword) {
+            const field = document.querySelector(`[name="${fieldName}"]`);
+            const fieldValue = field ? field.value.toLowerCase() : '';
+            if (fieldValue.includes(keyword.toLowerCase())) {
+                nextPage(nextPageNum);
+            } else {
+                nextPage(nextPageNum + 1); // Skip the conditional page
+            }
         }
 
         document.getElementById('playbookForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
-            const jsonData = Object.fromEntries(formData.entries());
-            // Handle multi-value fields (e.g., additional contacts as array)
-            jsonData.additional_contacts = jsonData.additional_contacts ? jsonData.additional_contacts.split(',') : [];
-            // Download as JSON or send to backend
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                if (key === 'attachments') {
+                    // Handle files as array of filenames (for JSON)
+                    if (!jsonData[key]) jsonData[key] = [];
+                    jsonData[key].push(value.name); // Actual file upload needs server
+                } else if (jsonData[key]) {
+                    if (!Array.isArray(jsonData[key])) jsonData[key] = [jsonData[key]];
+                    jsonData[key].push(value);
+                } else {
+                    jsonData[key] = value;
+                }
+            });
+            // Convert comma-separated strings to arrays
+            const arrayFields = ['additional_contacts', 'key_services', 'custom_fields_needed', 'key_assets', 'asset_types', 'key_vendors', 'vendor_contacts', 'locations', 'products_in_use', 'specific_integrations'];
+            arrayFields.forEach(field => {
+                if (typeof jsonData[field] === 'string' && jsonData[field].trim()) {
+                    jsonData[field] = jsonData[field].split(',').map(item => item.trim());
+                }
+            });
             downloadJSON(jsonData, 'intake_data.json');
-            // Or POST to server: fetch('/submit', { method: 'POST', body: JSON.stringify(jsonData) });
+            alert('Form submitted! Data downloaded as JSON.');
         });
 
         function downloadJSON(data, filename) {
-            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = filename; a.click();
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>
